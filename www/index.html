@@ -199,7 +199,8 @@ document.addEventListener('deviceready', function() {
 				}
 			)
 		}, 
-		write: function(filename, data){
+		write: function(filename, data){ 
+			/* Create/write to file. Parameters: filename, data */
 		    window.requestFileSystem(
 				LocalFileSystem.PERSISTENT, 
 				0, 
@@ -231,9 +232,7 @@ document.addEventListener('deviceready', function() {
 			);
 		}, 
 		start: function(filename){
-			/*
-				open file; 
-			*/
+			/* open file. Parameters: filename */
 			var cmdLine = this; 
 			// read file data; 
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, 
@@ -265,6 +264,7 @@ document.addEventListener('deviceready', function() {
 			)
 		}, 
 		download: function(requestURL, filename){
+			/* download file from web. Parameters: requestURL (e.g. "http://www.example.com") */
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
 				function(fileSystem) {
 					var directoryEntry = fileSystem.root; // to get root path to directory
