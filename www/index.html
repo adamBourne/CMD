@@ -71,16 +71,16 @@ document.addEventListener('deviceready', function() {
 	var CMD = {
 		CURRENT_DIR: '/',  
 		echo: function(msg){
-			/*
-				parameters: message. Output text
-			*/
 			return msg; 
 		}, 
-		mkdir: function(dirName){ 
-			/* 
-				paramters: directoryName. Create a new directory
-			*/
-			
+		help: function(){
+			var helpMonologue = []; 
+			for (var prop in window.CMD){
+				helpMonologue.push(prop); 
+			}
+			return helpMonologue + ''; 
+		}, 
+		mkdir: function(dirName){ // create a new directory; 
 			function gotDir(dirEntry) {
 				alert('created dir: ' + dirName); 
 			}
@@ -90,9 +90,7 @@ document.addEventListener('deviceready', function() {
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
 		},
 		rmdir: function(fullpath){
-			/* 
-				parameters: fullpath. Delete folder or file
-			*/
+			/* {"description": "remove directory by path string"} */
 			function fail(evt) {
 				alert("FILE SYSTEM FAILURE" + evt.target.error.code);
 			}; 
@@ -110,7 +108,7 @@ document.addEventListener('deviceready', function() {
 		}, 
 		cd: function(path){ 
 			/*
-				parameters: path. Change current directory
+				{"description": "change to new directory by path"}
 			*/
 			try{
 			var cmdLine = this; 
@@ -146,9 +144,6 @@ document.addEventListener('deviceready', function() {
 			}catch(e){alert(e)}
 		},  
 		dir: function(){
-			/*
-				list contents of current dir
-			*/
 			var cmdLine = this; 
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
 			   fileSystem.root.getDirectory(window.CMD.CURRENT_DIR, {
@@ -175,8 +170,7 @@ document.addEventListener('deviceready', function() {
 		}, 
 		read: function(filename){ 
 			/*
-				paramters: filename
-				get and display contents of file as text
+				get and display contents of file
 			*/
 			var cmdLine = this; 
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, 
@@ -205,11 +199,7 @@ document.addEventListener('deviceready', function() {
 				}
 			)
 		}, 
-		write: function(filename, data){ 
-			/*
-				parameters: filename, data
-				write text to file
-			*/
+		write: function(filename, data){
 		    window.requestFileSystem(
 				LocalFileSystem.PERSISTENT, 
 				0, 
@@ -242,8 +232,7 @@ document.addEventListener('deviceready', function() {
 		}, 
 		start: function(filename){
 			/*
-				parameters: filename
-				open file 
+				open file; 
 			*/
 			var cmdLine = this; 
 			// read file data; 
@@ -276,63 +265,39 @@ document.addEventListener('deviceready', function() {
 			)
 		}, 
 		download: function(requestURL, filename){
-			/*
-				params: requestURL (e.g. "http://www.example.co.uk"), filename
-				download file and from web into device directory
-			*/
-			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
-				function(fileSystem) {
-					var directoryEntry = fileSystem.root; // to get root path to directory
-					var rootdir = fileSystem.root;
-					var fp = 'cdvfile://localhost/persistent/'//rootdir.fullPath;
-					fp = fp + filename;
-					alert("downloading: " + requestURL + " to " + fp);
-					var fileTransfer = new FileTransfer();
-					alert("downloading: " + requestURL + " to " + fp);
-					fileTransfer.download(
-						encodeURI(requestURL),
-						fp,
-						function(theFile) {
-							alert("download complete: " + theFile.toURI());
-							//loadPDF(theFile.toURI(), y,x, canvasid, wrapperid);
-						},function(error) {
-							alert("error: " + JSON.stringify(error));
-						}
-					);
-				}, 
-				function(arg) { 
-					alert("FAIL ON requestFileSystem" + JSON.stringify(arg)); 
-				}
-			);			
-		},
-		help: function(){ 
-			/* Get help doc for commands */
-			var helpString = '', keys = Object.keys(CMD).sort(); 
 			
-			for (var n = 0; n < keys.length; n ++){ 
-				var functionName = keys[n]; 
-				if (functionName == 'help'){continue}; 
-				var func = CMD[functionName], funcString = func + ''; 
-				var helpStartIndex = funcString.indexOf('/*'), helpEndIndex = funcString.indexOf('*/'), thisHelp = ''; 
-				
-				while (helpStartIndex > -1 && helpEndIndex > -1 && helpEndIndex > helpStartIndex){
-					var newLine = funcString.substring(helpStartIndex + 2, helpEndIndex).trim(); // get next line between /* ... */
 
-					
-					thisHelp += '\t' + newLine + '\n'; 
-					
-					funcString = funcString.substring(helpEndIndex + 2); // remove last found help quoted between delimiters 
-					helpStartIndex = funcString.indexOf('/*'), helpEndIndex = funcString.indexOf('*/'); 
-				}
-				
-				helpString += functionName + ': \n' + thisHelp + '\n'; 
-			}; 
-			helpString += "\n"
-			return helpString; 
-		}		
+			
+		alert(filename);
+		window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
+			function(fileSystem) {
+				var directoryEntry = fileSystem.root; // to get root path to directory
+				var rootdir = fileSystem.root;
+				var fp = 'cdvfile://localhost/persistent/'//rootdir.fullPath;
+				fp = fp + filename;
+				alert("downloading: " + requestURL + " to " + fp);
+				var fileTransfer = new FileTransfer();
+				alert("downloading: " + requestURL + " to " + fp);
+				fileTransfer.download(
+					encodeURI(requestURL),
+					fp,
+					function(theFile) {
+						alert("download complete: " + theFile.toURI());
+						//loadPDF(theFile.toURI(), y,x, canvasid, wrapperid);
+					},function(error) {
+						alert("error: " + JSON.stringify(error));
+					}
+				);
+			}, 
+			function(arg) { 
+				alert("FAIL ON requestFileSystem" + JSON.stringify(arg)); 
+			}
+		);			
+			
+			
+
+		}
 	}
-	
-	
 	function cmdOninput(ev, textareaNode){ 
 		// deal with oddity that text area oninput fires upon it being created it appears that carriage return from previous input fires in newly created one, so remove the whitespace created by the carriage return?! 
 		var value = textareaNode.value, isOnlyWhiteSpace = /^\s+$/.test(value)
