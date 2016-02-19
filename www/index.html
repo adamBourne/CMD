@@ -265,38 +265,57 @@ document.addEventListener('deviceready', function() {
 			)
 		}, 
 		download: function(requestURL, filename){
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
+				function(fileSystem) {
+					var directoryEntry = fileSystem.root; // to get root path to directory
+					var rootdir = fileSystem.root;
+					var fp = 'cdvfile://localhost/persistent/'//rootdir.fullPath;
+					fp = fp + filename;
+					alert("downloading: " + requestURL + " to " + fp);
+					var fileTransfer = new FileTransfer();
+					alert("downloading: " + requestURL + " to " + fp);
+					fileTransfer.download(
+						encodeURI(requestURL),
+						fp,
+						function(theFile) {
+							alert("download complete: " + theFile.toURI());
+							//loadPDF(theFile.toURI(), y,x, canvasid, wrapperid);
+						},function(error) {
+							alert("error: " + JSON.stringify(error));
+						}
+					);
+				}, 
+				function(arg) { 
+					alert("FAIL ON requestFileSystem" + JSON.stringify(arg)); 
+				}
+			);			
+		},
+		help: function(){ 
+			/* Get help doc for commands */
+			var helpString = '', keys = Object.keys(CMD).sort(); 
 			
+			for (var n = 0; n < keys.length; n ++){ 
+				var functionName = keys[n]; 
+				if (functionName == 'help'){continue}; 
+				var func = CMD[functionName], funcString = func + ''; 
+				var helpStartIndex = funcString.indexOf('/*'), helpEndIndex = funcString.indexOf('*/'), thisHelp = ''; 
+				
+				while (helpStartIndex > -1 && helpEndIndex > -1 && helpEndIndex > helpStartIndex){
+					var newLine = funcString.substring(helpStartIndex + 2, helpEndIndex).trim(); // get next line between /* ... */
 
-			
-		alert(filename);
-		window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
-			function(fileSystem) {
-				var directoryEntry = fileSystem.root; // to get root path to directory
-				var rootdir = fileSystem.root;
-				var fp = 'cdvfile://localhost/persistent/'//rootdir.fullPath;
-				fp = fp + filename;
-				alert("downloading: " + requestURL + " to " + fp);
-				var fileTransfer = new FileTransfer();
-				alert("downloading: " + requestURL + " to " + fp);
-				fileTransfer.download(
-					encodeURI(requestURL),
-					fp,
-					function(theFile) {
-						alert("download complete: " + theFile.toURI());
-						//loadPDF(theFile.toURI(), y,x, canvasid, wrapperid);
-					},function(error) {
-						alert("error: " + JSON.stringify(error));
-					}
-				);
-			}, 
-			function(arg) { 
-				alert("FAIL ON requestFileSystem" + JSON.stringify(arg)); 
-			}
-		);			
-			
-			
-
-		}
+					
+					thisHelp += '\t' + newLine + '\n'; 
+					
+					funcString = funcString.substring(helpEndIndex + 2); // remove last found help quoted between delimiters 
+					helpStartIndex = funcString.indexOf('/*'), helpEndIndex = funcString.indexOf('*/'); 
+				}
+				
+				helpString += functionName + ': \n' + thisHelp + '\n'; 
+			}; 
+			helpString += "\n"
+			return helpString; 
+		}				
+		
 	}
 	function cmdOninput(ev, textareaNode){ 
 		// deal with oddity that text area oninput fires upon it being created it appears that carriage return from previous input fires in newly created one, so remove the whitespace created by the carriage return?! 
