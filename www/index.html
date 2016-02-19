@@ -45,7 +45,7 @@
 		
 		
 		
-	<br><br><br>bla
+	<br><br><br>aaa
 <script>
 // file stuff; 
 var fileSystem; 
@@ -66,6 +66,32 @@ document.addEventListener('deviceready', function() {
 	}catch(e){alert(e)}
 }, false);
 
+</script>
+<script>
+// CMD stuff; 
+
+	var CMD = {
+		CURRENT_DIR: '/',  
+		echo: function(msg){
+			return msg; 
+		}, 
+		help: function(){
+			var helpMonologue = []; 
+			for (var prop in window.CMD){
+				helpMonologue.push(prop); 
+			}
+			return helpMonologue + ''; 
+		}, 
+		mkdir: function(dirName){ // create a new directory; 
+			function gotDir(dirEntry) {
+				alert('created dir: ' + dirName); 
+			}
+			function gotFS(fileSystem) {
+				fileSystem.root.getDirectory(dirName, {create: true}, gotDir);
+			}; 
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
+		}
+	}
 </script>
 	
     </body>
