@@ -45,8 +45,20 @@
 		
 		
 		
-	<br><br><br>cunt
-	
+	<br><br><br>
+<script>
+// file stuff; 
+var fileSystem; 
+function gotFS(fileSys) {
+    // save the file system for later access
+    alert(fileSystem.root.fullPath);
+    window.rootFS = fileSys.root;
+}
+
+function fail(err){
+	alert(err)
+}
+</script>
 	
     </body>
 </html>
