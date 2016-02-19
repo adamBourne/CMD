@@ -90,6 +90,214 @@ document.addEventListener('deviceready', function() {
 				fileSystem.root.getDirectory(dirName, {create: true}, gotDir);
 			}; 
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
+		},
+		rmdir: function(fullpath){
+			/* {"description": "remove directory by path string"} */
+			function fail(evt) {
+				alert("FILE SYSTEM FAILURE" + evt.target.error.code);
+			}; 
+			function onFileSystemSuccess(fileSystem) {
+				fileSystem.root.getDirectory(
+					fullpath,
+					{create : true, exclusive : false},
+					function(entry) {
+					entry.removeRecursively(function() {
+						alert("Remove Recursively Succeeded");
+					}, fail);
+				}, fail);
+			}; 
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
+		}, 
+		cd: function(path){ 
+			/*
+				{"description": "change to new directory by path"}
+			*/
+			try{
+			var cmdLine = this; 
+			window.requestFileSystem(
+				LocalFileSystem.PERSISTENT, 
+				0, 
+				function(fileSystem) { // got filesystem; 
+					fileSystem.root.getDirectory( 
+						path, 
+						{
+						   create: true
+						}, 
+						function(directory) {
+							var directoryReader = directory.createReader();
+							directoryReader.readEntries(
+								function(entries) {
+									CMD.CURRENT_DIR = path;  
+									addOutput(cmdLine, 'path = "' + path + '", entries = ' + entries); 
+									//alert('success')
+								}, 
+								function (error) {
+									alert(error.code)
+								}
+							);
+						} 
+					);
+				}, 
+				function(error) {
+					alert(error.code)
+					//addErrorMessage(cmdLine, error.code)
+				}
+			);
+			}catch(e){alert(e)}
+		},  
+		dir: function(){
+			var cmdLine = this; 
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+			   fileSystem.root.getDirectory(window.CMD.CURRENT_DIR, {
+					   create: true
+				   }, function(directory) {
+
+					var directoryReader = directory.createReader();
+					directoryReader.readEntries(function(entries) {
+						var i, msg = [];
+						for (i=0; i<entries.length; i++) {
+							msg.push(entries[i].fullPath); 
+						}
+						msg = msg.join('\n'); 
+						//alert(this); 
+						addOutput(cmdLine, msg); 
+					}, function (error) {
+						addErrorMessage(cmdLine, error.code)
+					});
+
+				   } );
+			}, function(error) {
+			   addErrorMessage(cmdLine, error.code)
+			});
+		}, 
+		read: function(filename){ 
+			/*
+				get and display contents of file
+			*/
+			var cmdLine = this; 
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, 
+				function(fileSystem) { // got file system; 
+					fileSystem.root.getFile(filename, null, 
+						function(fileEntry){ // get fileEntry by filename; 
+							fileEntry.file(
+								function(file){ // got file object
+									var reader = new FileReader();
+									reader.onloadend = function(evt) { // read file data; 
+										addOutput(cmdLine, evt.target.result);
+									};
+									reader.readAsText(file);
+								}, 
+								function(err){ // failed to get file object; 
+									alert(err); 
+								}
+							);
+						}, function(err){ // failed to get file
+							alert(err); 
+						}
+					);
+				}, 
+				function(err){ // failed to get file system; 
+					alert(err); 
+				}
+			)
+		}, 
+		write: function(filename, data){
+		    window.requestFileSystem(
+				LocalFileSystem.PERSISTENT, 
+				0, 
+				function(fileSystem) { // got file system; 
+					fileSystem.root.getFile(
+						filename, 
+						{create: true}, 
+						function(fileEntry){ // got file entry; 
+							fileEntry.createWriter(
+								function (writer){ // got fileWriter; 
+									// write to file; 
+									writer.onwriteend = function(evt) { 
+									};
+									writer.write(data);
+								}, 
+								function (err){ // failed to create fileWriter; 
+									alert(err); 
+								}
+							);
+						}
+					), 
+					function (err){ // failed to get file; 
+						alert(err); 
+					}
+				}, 
+				function(err){ // failed to get file system; 
+					alert(err)
+				}
+			);
+		}, 
+		start: function(filename){
+			/*
+				open file; 
+			*/
+			var cmdLine = this; 
+			// read file data; 
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, 
+				function(fileSystem) { // got file system; 
+					fileSystem.root.getFile(filename, null, 
+						function(fileEntry){ // get fileEntry by filename; 
+							fileEntry.file(
+								function(file){ // got file object
+									var reader = new FileReader();
+									reader.onloadend = function(evt) { // read file data; 
+										//addOutput(cmdLine, evt.target.result); 
+										var url = evt.target.result; 
+										window.open(url, filename, "menubar=yes, scrollbars=yes, status=yes, titlebar=yes, toolbar=yes"); 
+									};
+									reader.readAsDataURL(file);
+								}, 
+								function(err){ // failed to get file object; 
+									alert(err); 
+								}
+							);
+						}, function(err){ // failed to get file
+							alert(err); 
+						}
+					);
+				}, 
+				function(err){ // failed to get file system; 
+					alert(err); 
+				}
+			)
+		}, 
+		download: function(requestURL, filename){
+			
+
+			
+		alert(filename);
+		window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
+			function(fileSystem) {
+				var directoryEntry = fileSystem.root; // to get root path to directory
+				var rootdir = fileSystem.root;
+				var fp = 'cdvfile://localhost/persistent/'//rootdir.fullPath;
+				fp = fp + filename;
+				alert("downloading: " + requestURL + " to " + fp);
+				var fileTransfer = new FileTransfer();
+				alert("downloading: " + requestURL + " to " + fp);
+				fileTransfer.download(
+					encodeURI(requestURL),
+					fp,
+					function(theFile) {
+						alert("download complete: " + theFile.toURI());
+						//loadPDF(theFile.toURI(), y,x, canvasid, wrapperid);
+					},function(error) {
+						alert("error: " + JSON.stringify(error));
+					}
+				);
+			}, 
+			function(arg) { 
+				alert("FAIL ON requestFileSystem" + JSON.stringify(arg)); 
+			}
+		);			
+			
+			
+
 		}
 	}
 </script>
