@@ -45,7 +45,7 @@
 		
 		
 		
-	<br><br><br>
+	<br><br><br>bla
 <script>
 // file stuff; 
 var fileSystem; 
@@ -58,6 +58,14 @@ function gotFS(fileSys) {
 function fail(err){
 	alert(err)
 }
+document.addEventListener('deviceready', function() { 
+	//var props = []; for (var prop in window){props.push(prop)}; props.sort(); alert(props); 
+	try{
+	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail); 
+	}catch(e){alert(e)}
+}, false);
+
 </script>
 	
     </body>
