@@ -47,29 +47,7 @@
 		
 	<br><br><br>
 		
-<script>
-try{
-// file stuff; 
-var fileSystem; 
-function gotFS(fileSys) {
-    // save the file system for later access
-    alert(fileSystem.root.fullPath);
-    window.rootFS = fileSys.root;
-}
-
-function fail(err){
-	alert(err)
-}
-
-document.addEventListener('deviceready', function() { 
-	//var props = []; for (var prop in window){props.push(prop)}; props.sort(); alert(props); 
-	try{
-	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail); 
-	}catch(e){alert(e)}
-}, false);
-}catch(e){alert(e)}
-</script>		
+		
 		
 		
 		
