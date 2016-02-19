@@ -1,7 +1,7 @@
 html {
 	margin: 0; 
 	font-size: 2vw; 
-	background: red; 
+	background: black; 
 }
 
 .CMDLine .value, .CMDLine .prompt, .CMDOutput .value, .CMDOutput .prompt, .CMDErrorMessage .prompt, .CMDErrorMessage .value{
