@@ -1,3 +1,5 @@
+<!--div id="testNode">test node</div-->
+
 <style>
 
 html {
@@ -480,6 +482,9 @@ function toggleOpenClose(valueEditConsole){
 
 
 
+
+
+
 <script>
 function overrideCSS(node, cssText){ /* overrides any CSS stored in cssText style attribute */
 	node.style.cssText += cssText; 
@@ -636,8 +641,6 @@ function getAttributeNames(obj){
         }; 
         attributeNames.push('returnValue'); 
     } else {
-		//alert('kunt');
-		//attributeNames = Object.keys(obj); 
         for (var attributeName in obj){
             attributeNames.push(attributeName); 
         }
@@ -705,7 +708,7 @@ function getMenuNodes(parentObject, objectName){ // get collection of menu nodes
 	
     var object = parentObject[objectName]//, type = typeof object;
     var attributeNames = getAttributeNames(object); 
-	//alert('attributeNames = ' + attributeNames);
+
     var attributeName; 
     for (var n = 0; n < attributeNames.length; n ++){ 
         attributeName = attributeNames[n]; 
@@ -743,46 +746,28 @@ function getGUI(parentNode, parentObject, objectName){ // additionalClassName (o
     } else { // openMenuNode; 
         var newMenuNodes = getMenuNodes(parentObject, objectName); 
         openMenuNode(parentNode, newMenuNodes); 
-		//alert('opening: newMenuNodes.childNodes.length = ' + newMenuNodes.childNodes.length)
 		parentNode.classList.add('opened');
     }; 
 };
 
 
-</script>
 
 
-<script type="text/javascript" src="cordova.js"></script>
-<script type="text/javascript" src="js/index.js"></script>
-<script>
-// file stuff; 
 
-function gotFS(fileSys) {
-    // save the file system for later access
-    window.rootFS = fileSys.root;
+
+
+window.onload = function (){ 
+    var testNode = document.getElementById('testNode'); 
     var menuRoot = document.querySelector('.menu'); 
-    getGUI(menuRoot, window, 'rootFS'); 
-	alert('window.rootFS = ' + JSON.stringify(window.rootFS)); 
-}
+    getGUI(menuRoot, testNode.parentNode.childNodes, '0'); 
+}; 
 
-function fail(err){
-	alert(err)
-}
 
-document.addEventListener('deviceready', function() { 
-	try{
-	alert('device ready'); 
-	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail); 
-	}catch(e){alert(e)}
-}, false);
+
 
 </script>
+ 
+ 
+ <div id="testId" class="menu"></div>
 
-
-<div id="testId" class="menu"></div>
-
-        <script type="text/javascript">
-            app.initialize();
-        </script>
 
