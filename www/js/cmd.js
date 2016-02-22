@@ -354,3 +354,47 @@ document.addEventListener('deviceready', function() {
 		valueNode.style.height = "1em";
         valueNode.style.height = (valueNode.scrollHeight) + "px"; 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+// file manager functions; 
+	
+var FileManager = {
+	
+	getDirContentsArray: function(dirPath, callback){ // callback(thisNode, namesArray)
+			dirPath = dirPath || '/'; 
+			var thisNode = this; 
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+			   fileSystem.root.getDirectory(dirPath, {
+					   create: true
+				   }, function(directory) {
+
+					var directoryReader = directory.createReader();
+					directoryReader.readEntries(function(entries) {
+						var i, dirObj = {};
+						for (i = 0; i < entries.length; i++) {
+							//names.push(entries[i].fullPath); 
+							var entry = entries[i]; 
+							dirObj[entry.name] = {isFile: entry.isFile, fullPath: entry.fullPath}//entry; 
+						} 
+						callback(thisNode, dirObj); 
+					}, function (error) {
+						alert(error.code)
+				});
+		   } );
+		}, function(error) {
+			   alert(error.code)
+		});
+	}
+}

@@ -1,0 +1,25 @@
+.disable-select {
+	-webkit-user-select: none;  
+	-moz-user-select: none;    
+	-ms-user-select: none;      
+	user-select: none;
+}
+
+.heading {
+	text-align: center; 
+	font-size: 2em; 
+	font-family: Helvetica; 
+}
+
+.folder > :not(.title) {
+	padding-left: 1rem; 
+}
+
+.folder .value, .file .value {
+	font-family: Helvetica; 
+	
+}
+
+.highlighted {
+	color: red; 
+}
